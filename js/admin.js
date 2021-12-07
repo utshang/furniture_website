@@ -1,4 +1,3 @@
-//測試
 function init() {
   getOrderList();
 }
@@ -20,7 +19,9 @@ function getOrderList() {
     .then(function (response) {
       console.log(response.data.orders);
       orderListData = response.data.orders;
+
       renderOrderList();
+      renderC3();
     });
 }
 
@@ -41,6 +42,7 @@ function renderOrderList() {
     }
 
     //訂單資訊
+    //將 Unix 時間戳轉換為 JavaScript Date 時間戳
     str += ` <tr>
     <td>${item.id}</td>
     <td>
@@ -52,9 +54,9 @@ function renderOrderList() {
     <td>
       ${productStr}
     </td>
-    <td>${new Date(item.createdAt).getFullYear()}/${new Date(
-      item.createdAt
-    ).getMonth()}/${new Date(item.createdAt).getDate()}</td>
+    <td>${new Date(item.createdAt * 1000).getFullYear()}/${
+      new Date(item.createdAt * 1000).getMonth() + 1
+    }/${new Date(item.createdAt * 1000).getDate()}</td>
     <td >
       <a href="#" class="orderStatus" data-orderId="${item.id}" data-status="${
       item.paid
@@ -73,7 +75,6 @@ function renderOrderList() {
 }
 
 // // 修改訂單狀態
-// createError.js:16 Uncaught (in promise) Error: Request failed with status code 400
 
 $(".orderList-info").on("click", (e) => {
   e.preventDefault();
@@ -110,6 +111,7 @@ function editOrderList(orderId, status) {
     )
     .then(function (response) {
       alert("狀態更改");
+      getOrderList();
     });
 }
 
@@ -168,22 +170,94 @@ function deleteOrderItem(orderId) {
 
 // C3.js
 // LV1：做圓餅圖，做全產品類別營收比重，類別含三項，共有：床架、收納、窗簾
-// LV2：做圓餅圖，做全品項營收比重，類別含四項，篩選出前三名營收品項，其他 4~8 名都統整為「其它」
-let chart = c3.generate({
-  bindto: "#chart", // HTML 元素綁定
-  data: {
-    type: "pie",
-    columns: [
-      ["Louvre 雙人床架", 1],
-      ["Antony 雙人床架", 2],
-      ["Anty 雙人床架", 3],
-      ["其他", 4],
-    ],
-    colors: {
-      "Louvre 雙人床架": "#DACBFF",
-      "Antony 雙人床架": "#9D7FEA",
-      "Anty 雙人床架": "#5434A7",
-      其他: "#301E5F",
+// 組資料
+// let c3Obj = {};
+// function renderC3() {
+//   orderListData.forEach((item) => {
+//     item.products.forEach((item) => {
+//       if (c3Obj[item.category] === undefined) {
+//         c3Obj[item.category] = item.price * item.quantity;
+//       } else {
+//         c3Obj[item.category] += item.price * item.quantity;
+//       }
+//     });
+//   });
+//   console.log(c3Obj);
+//   let c3Arr = [];
+//   let c3Keys = Object.keys(c3Obj);
+//   console.log(c3Keys);
+
+//   c3Keys.forEach((item) => {
+//     c3Arr.push([item, c3Obj[item]]);
+//   });
+//   console.log(c3Arr);
+
+//   //渲染圖表
+//   let chart = c3.generate({
+//     bindto: "#chart", // HTML 元素綁定
+//     data: {
+//       type: "pie",
+//       columns: c3Arr,
+//       colors: {
+//         床架: "#7E7474",
+//         收納: "#B2B1B9",
+//         窗簾: "#A7BBC7",
+//       },
+//     },
+//   });
+// }
+// LV2：做圓餅圖，做各產品類別營收比重，類別含四項，篩選出前三名營收品項，其他 4~8 名都統整為「其它」
+let c3Obj = {};
+function renderC3() {
+  orderListData.forEach((item) => {
+    item.products.forEach((item) => {
+      if (c3Obj[item.title] === undefined) {
+        c3Obj[item.title] = item.price * item.quantity;
+      } else {
+        c3Obj[item.title] += item.price * item.quantity;
+      }
+    });
+  });
+  console.log(c3Obj);
+  let c3Arr = [];
+  let c3Keys = Object.keys(c3Obj);
+  console.log(c3Keys);
+
+  c3Keys.forEach((item) => {
+    c3Arr.push([item, c3Obj[item]]);
+  });
+  console.log(c3Arr);
+
+  // ['Antony 床邊桌', 18900]
+  //         0          1     陣列跟陣列無法比較，所以要取出陣列的第二筆資料（也就是各產品類別的總金額）去從大到小排序
+  c3Arr.sort(function (a, b) {
+    return b[1] - a[1];
+  });
+  console.log(c3Arr);
+
+  //超過四筆，做以下判斷，低於四筆則直接跑下方圖表
+  if (c3Arr.length > 3) {
+    let other = 0;
+    c3Arr.forEach((item, index) => {
+      if (index > 2) {
+        other += c3Arr[index][1];
+      }
+    });
+    c3Arr.splice(3, c3Arr.length - 1);
+    c3Arr.push(["其他", other]);
+  }
+
+  //渲染圖表
+  let chart = c3.generate({
+    bindto: "#chart", // HTML 元素綁定
+    data: {
+      type: "pie",
+      columns: c3Arr,
+      colors: {
+        床架: "#7E7474",
+        收納: "#B2B1B9",
+        窗簾: "#A7BBC7",
+      },
     },
-  },
-});
+  });
+}

@@ -56,8 +56,8 @@ function renderList(option) {
     />
     <a href="#" class="addCardBtn" data-id="${item.id}">加入購物車</a>
     <h3>${item.title}</h3>
-    <del class="originPrice">NT$${item.origin_price}</del>
-    <p class="nowPrice">NT$${item.price}</p>
+    <del class="originPrice">NT$ ${item.origin_price.toLocaleString()}</del>
+    <p class="nowPrice">NT$ ${item.price.toLocaleString()}</p>
   </li>`;
   });
   $(".productWrap").html(str);
@@ -100,9 +100,9 @@ function renderCartList() {
         <p>${item.product.title}</p>
       </div>
     </td>
-    <td>${item.product.price}</td>
+    <td>NT$ ${item.product.price.toLocaleString()}</td>
     <td>${item.quantity}</td>
-    <td>${item.product.price * item.quantity}</td>
+    <td>NT$ ${(item.product.price * item.quantity).toLocaleString()}</td>
     <td class="discardBtn">
       <a href="#" class="material-icons" data-cartId="${item.id}"> clear </a>
     </td>
@@ -125,7 +125,7 @@ function renderPriceData() {
   <td>
     <p>總金額</p>
   </td>
-  <td>NT$ ${priceData.finalTotal}</td>
+  <td>NT$ ${priceData.finalTotal.toLocaleString()}</td>
   <tr>`;
 
   $(".btnAndPrice").html(str);
@@ -291,6 +291,79 @@ function deleteCartItem(cartId) {
     });
 }
 
+//表單驗證 validate.js
+
+const form = document.querySelector(".orderInfo-form");
+const inputs = document.querySelectorAll(
+  "input[type=text],input[type=email],input[type=tel],select[id=tradeWay]"
+);
+console.log(inputs);
+
+let constraints = {
+  姓名: {
+    presence: {
+      message: "必填",
+    },
+  },
+  電話: {
+    presence: {
+      message: "必填",
+    },
+    length: {
+      minimum: 10,
+      message: "手機號碼格式不正確",
+    },
+  },
+  Email: {
+    presence: {
+      message: "必填",
+    },
+    email: {
+      message: "Email格式不正確",
+    },
+  },
+  寄送地址: {
+    presence: {
+      message: "必填",
+    },
+  },
+  交易方式: {
+    presence: {
+      message: "必填",
+    },
+  },
+};
+
+inputs.forEach((item) => {
+  item.addEventListener("change", (e) => {
+    e.preventDefault();
+    item.nextElementSibling.textContent = "";
+    let errors = validate(form, constraints) || "";
+    console.log(errors);
+
+    if (errors) {
+      Object.keys(errors).forEach(function (keys) {
+        console.log(document.querySelector(`[data-message=${keys}]`));
+        document.querySelector(`[data-message="${keys}"]`).textContent =
+          errors[keys];
+      });
+    }
+  });
+});
+
+//表單驗證 判斷必填
+// console.log(inputs);
+// const inputArr = Array.from(inputs);
+// inputArr.forEach((item) => {
+//   item.addEventListener("blur", (e) => {
+//     if (item.value === "") {
+//       item.nextElementSibling.textContent = "必填";
+//     } else {
+//       item.nextElementSibling.textContent = "";
+//     }
+//   });
+// });
+
 // // 送出購買訂單
 //購物車要有東西，且預定資料填寫完整才可送出
 
@@ -299,14 +372,17 @@ $(".orderInfo-btn").on("click", (e) => {
 
   if (cartsData.length === 0) {
     alert("目前購物車中沒有商品，將欲購買的商品加入購物車");
-  } else if (
+    return;
+  }
+
+  if (
     $("#customerName").val() === "" ||
     $("#customerPhone").val() === "" ||
     $("#customerEmail").val() === "" ||
     $("#customerAddress").val() === "" ||
     $("#tradeWay").val() === ""
   ) {
-    alert("資料不完整");
+    alert("請填寫完整資料");
   }
 
   let userData = {
@@ -324,28 +400,6 @@ $(".orderInfo-btn").on("click", (e) => {
   document.querySelector("#customerEmail").value = "";
   document.querySelector("#customerAddress").value = "";
   document.querySelector("#tradeWay").value = "";
-
-  //驗證
-  // const alertMsgAll = document.querySelectorAll("[data-message]");
-  // console.log(alertMsgAll);
-  // alertMsgAll.forEach((item) => {
-  //   if (
-  //     $("#customerName").val() === "" ||
-  //     $("#customerPhone").val() === "" ||
-  //     $("#customerEmail").val() === "" ||
-  //     $("#customerAddress").val() === "" ||
-  //     $("#tradeWay").val() === ""
-  //   ) {
-  //     item.textContent = `${item.dataset.message} 必填！`;
-  //   }
-  // });
-  // } else {
-  //   document.querySelector("#customerName").value = "";
-  //   document.querySelector("#customerPhone").value = "";
-  //   document.querySelector("#customerEmail").value = "";
-  //   document.querySelector("#customerAddress").value = "";
-  //   document.querySelector("#tradeWay").value = "";
-  // }
 });
 
 function createOrder(userData) {
