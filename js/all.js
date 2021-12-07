@@ -319,7 +319,7 @@ let constraints = {
       message: "必填",
     },
     email: {
-      message: "Email格式不正確",
+      message: "格式不正確",
     },
   },
   寄送地址: {
@@ -335,7 +335,7 @@ let constraints = {
 };
 
 inputs.forEach((item) => {
-  item.addEventListener("change", (e) => {
+  item.addEventListener("blur", (e) => {
     e.preventDefault();
     item.nextElementSibling.textContent = "";
     let errors = validate(form, constraints) || "";
@@ -363,6 +363,30 @@ inputs.forEach((item) => {
 //     }
 //   });
 // });
+
+//不用套件 表單驗證 判斷必填以及其他條件
+
+// $("#customerEmail").on("blur", (e) => {
+//   if (
+//     !/^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/.test(
+//       $("#customerEmail").val()
+//     )
+//   ) {
+//     $(".errMeg-email").text("格式不正確");
+//   } else if ($("#customerEmail").val() === "") {
+//     $(".errMeg-email").text("必填");
+//   } else {
+//     $(".errMeg-email").text("");
+//   }
+// });
+
+// else if (
+//   /^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z]+$/.test(
+//     $("#customerEmail").value
+//   )
+// ) {
+//   $(".errMeg-email").text = "Email格式不正確，例：abc123@gmail.com";
+// }
 
 // // 送出購買訂單
 //購物車要有東西，且預定資料填寫完整才可送出
