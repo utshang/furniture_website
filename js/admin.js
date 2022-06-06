@@ -88,7 +88,7 @@ $(".orderList-info").on("click", (e) => {
 function editOrderList(orderId, status) {
   console.log(orderId, status);
   let changeStatus;
-  if (status === false) {
+  if (status === "false") {
     changeStatus = true;
   } else {
     changeStatus = false;
@@ -111,6 +111,7 @@ function editOrderList(orderId, status) {
     )
     .then(function (response) {
       alert("狀態更改");
+
       getOrderList();
     });
 }
@@ -138,6 +139,7 @@ function deleteAllOrder() {
     .then(function (response) {
       console.log(response.data);
       getOrderList();
+      renderC3();
     });
 }
 
@@ -165,6 +167,7 @@ function deleteOrderItem(orderId) {
     .then(function (response) {
       console.log(response.data);
       getOrderList();
+      renderC3();
     });
 }
 
@@ -254,7 +257,7 @@ function renderC3() {
       type: "pie",
       columns: c3Arr,
       colors: {
-        床架: "#7E7474",
+        c3Arr: "#7E7474",
         收納: "#B2B1B9",
         窗簾: "#A7BBC7",
       },
