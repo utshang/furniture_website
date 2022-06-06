@@ -17,11 +17,13 @@ function getOrderList() {
       }
     )
     .then(function (response) {
-      console.log(response.data.orders);
       orderListData = response.data.orders;
 
       renderOrderList();
       renderC3();
+    })
+    .catch(function (error) {
+      alert(error);
     });
 }
 
@@ -86,14 +88,12 @@ $(".orderList-info").on("click", (e) => {
 });
 
 function editOrderList(orderId, status) {
-  console.log(orderId, status);
   let changeStatus;
   if (status === "false") {
     changeStatus = true;
   } else {
     changeStatus = false;
   }
-  console.log(changeStatus);
   axios
     .put(
       `https://livejs-api.hexschool.io/api/livejs/v1/admin/${api_path}/orders`,
@@ -113,6 +113,9 @@ function editOrderList(orderId, status) {
       alert("狀態更改");
 
       getOrderList();
+    })
+    .catch(function (error) {
+      alert(error);
     });
 }
 
@@ -137,9 +140,11 @@ function deleteAllOrder() {
       }
     )
     .then(function (response) {
-      console.log(response.data);
       getOrderList();
       renderC3();
+    })
+    .catch(function (error) {
+      alert(error);
     });
 }
 
@@ -165,50 +170,14 @@ function deleteOrderItem(orderId) {
       }
     )
     .then(function (response) {
-      console.log(response.data);
       getOrderList();
       renderC3();
+    })
+    .catch(function (error) {
+      alert(error);
     });
 }
 
-// C3.js
-// LV1：做圓餅圖，做全產品類別營收比重，類別含三項，共有：床架、收納、窗簾
-// 組資料
-// let c3Obj = {};
-// function renderC3() {
-//   orderListData.forEach((item) => {
-//     item.products.forEach((item) => {
-//       if (c3Obj[item.category] === undefined) {
-//         c3Obj[item.category] = item.price * item.quantity;
-//       } else {
-//         c3Obj[item.category] += item.price * item.quantity;
-//       }
-//     });
-//   });
-//   console.log(c3Obj);
-//   let c3Arr = [];
-//   let c3Keys = Object.keys(c3Obj);
-//   console.log(c3Keys);
-
-//   c3Keys.forEach((item) => {
-//     c3Arr.push([item, c3Obj[item]]);
-//   });
-//   console.log(c3Arr);
-
-//   //渲染圖表
-//   let chart = c3.generate({
-//     bindto: "#chart", // HTML 元素綁定
-//     data: {
-//       type: "pie",
-//       columns: c3Arr,
-//       colors: {
-//         床架: "#7E7474",
-//         收納: "#B2B1B9",
-//         窗簾: "#A7BBC7",
-//       },
-//     },
-//   });
-// }
 // LV2：做圓餅圖，做各產品類別營收比重，類別含四項，篩選出前三名營收品項，其他 4~8 名都統整為「其它」
 let c3Obj = {};
 function renderC3() {
@@ -221,22 +190,18 @@ function renderC3() {
       }
     });
   });
-  console.log(c3Obj);
   let c3Arr = [];
   let c3Keys = Object.keys(c3Obj);
-  console.log(c3Keys);
 
   c3Keys.forEach((item) => {
     c3Arr.push([item, c3Obj[item]]);
   });
-  console.log(c3Arr);
 
   // ['Antony 床邊桌', 18900]
   //         0          1     陣列跟陣列無法比較，所以要取出陣列的第二筆資料（也就是各產品類別的總金額）去從大到小排序
   c3Arr.sort(function (a, b) {
     return b[1] - a[1];
   });
-  console.log(c3Arr);
 
   //超過四筆，做以下判斷，低於四筆則直接跑下方圖表
   if (c3Arr.length > 3) {

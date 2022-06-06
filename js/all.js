@@ -21,17 +21,13 @@ function getProductList() {
     })
     .catch(function (error) {
       // handle error
-      console.log(error);
-    })
-    .then(function () {
-      // always executed
+      alert(error);
     });
 }
 
 //篩選類別
 
 $(".productSelect").on("change", (e) => {
-  console.log(e.target.value);
   renderList(e.target.value);
 });
 
@@ -74,18 +70,10 @@ function getCartList() {
       priceData = response.data;
       renderCartList();
       renderPriceData();
-      // $(".total-price").text(response.data.finalTotal);
-      // console.log(cartsData);
-      // console.log(response.data);
-      // console.log(priceData.total);
-      // console.log(priceData);
     })
     .catch(function (error) {
       // handle error
-      console.log(error);
-    })
-    .then(function () {
-      // always executed
+      alert(error);
     });
 }
 
@@ -141,7 +129,7 @@ $(".productWrap").on("click", (e) => {
   }
   //如果點擊到的是「加入購物車」按鈕，取得該按鈕的data-id，傳入addCartItem函示中
   let id = e.target.getAttribute("data-id");
-  console.log(id);
+
   addCartItem(id);
 });
 
@@ -169,58 +157,9 @@ function addCartItem(id) {
     })
     .catch(function (error) {
       // handle error
-      console.log(error);
-    })
-    .then(function () {
-      // always executed
+      alert(error);
     });
 }
-
-// 加入購物車 寫法二
-
-// $(".productWrap").on("click", (e) => {
-//   e.preventDefault();
-//   console.log(e.target.getAttribute("data-id"));
-
-//   if (e.target.getAttribute("class") !== "addCardBtn") {
-//     return;
-//   }
-
-//   let id = e.target.getAttribute("data-id");
-//   console.log(e.target.getAttribute("data-id"));
-
-//
-//   let num = 1;
-//   cartsData.forEach((item) => {
-//     if (item.product.id === id) {
-//       num = item.quantity += 1;
-//       console.log(num);
-//     }
-//   });
-//   console.log(num);
-
-//   axios
-//     .post(
-//       `https://livejs-api.hexschool.io/api/livejs/v1/customer/${api_path}/carts`,
-//       {
-//         data: {
-//           productId: id,
-//           quantity: num,
-//         },
-//       }
-//     )
-//     .then(function (response) {
-//       console.log(response.data);
-//       getCartList();
-//     })
-//     .catch(function (error) {
-//       // handle error
-//       console.log(error);
-//     })
-//     .then(function () {
-//       // always executed
-//     });
-// });
 
 // 清除購物車內全部產品;
 
@@ -234,7 +173,6 @@ $(".btnAndPrice").on("click", (e) => {
     return;
   }
 
-  console.log(e.target);
   deleteAllCartList();
 });
 
@@ -244,15 +182,11 @@ function deleteAllCartList() {
       `https://livejs-api.hexschool.io/api/livejs/v1/customer/${api_path}/carts`
     )
     .then(function (response) {
-      console.log(response.data);
       getCartList();
     })
     .catch(function (error) {
       // handle error
-      console.log(error);
-    })
-    .then(function () {
-      // always executed
+      alert(error);
     });
 }
 
@@ -268,7 +202,6 @@ $(".cartItem-info").on("click", (e) => {
     return;
   }
   let cartId = e.target.getAttribute("data-cartId");
-  console.log(cartId);
   deleteCartItem(cartId);
 });
 
@@ -278,16 +211,12 @@ function deleteCartItem(cartId) {
       `https://livejs-api.hexschool.io/api/livejs/v1/customer/${api_path}/carts/${cartId}`
     )
     .then(function (response) {
-      console.log(response.data);
       //重新渲染購物車列表
       getCartList();
     })
     .catch(function (error) {
       // handle error
-      console.log(error);
-    })
-    .then(function () {
-      // always executed
+      alert(error);
     });
 }
 
@@ -297,7 +226,6 @@ const form = document.querySelector(".orderInfo-form");
 const inputs = document.querySelectorAll(
   "input[type=text],input[type=email],input[type=tel],select[id=tradeWay]"
 );
-console.log(inputs);
 
 let constraints = {
   姓名: {
@@ -339,54 +267,15 @@ inputs.forEach((item) => {
     e.preventDefault();
     item.nextElementSibling.textContent = "";
     let errors = validate(form, constraints) || "";
-    console.log(errors);
 
     if (errors) {
       Object.keys(errors).forEach(function (keys) {
-        console.log(document.querySelector(`[data-message=${keys}]`));
         document.querySelector(`[data-message="${keys}"]`).textContent =
           errors[keys];
       });
     }
   });
 });
-
-//表單驗證 判斷必填
-// console.log(inputs);
-// const inputArr = Array.from(inputs);
-// inputArr.forEach((item) => {
-//   item.addEventListener("blur", (e) => {
-//     if (item.value === "") {
-//       item.nextElementSibling.textContent = "必填";
-//     } else {
-//       item.nextElementSibling.textContent = "";
-//     }
-//   });
-// });
-
-//不用套件 表單驗證 判斷必填以及其他條件
-
-// $("#customerEmail").on("blur", (e) => {
-//   if (
-//     !/^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/.test(
-//       $("#customerEmail").val()
-//     )
-//   ) {
-//     $(".errMeg-email").text("格式不正確");
-//   } else if ($("#customerEmail").val() === "") {
-//     $(".errMeg-email").text("必填");
-//   } else {
-//     $(".errMeg-email").text("");
-//   }
-// });
-
-// else if (
-//   /^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z]+$/.test(
-//     $("#customerEmail").value
-//   )
-// ) {
-//   $(".errMeg-email").text = "Email格式不正確，例：abc123@gmail.com";
-// }
 
 // // 送出購買訂單
 //購物車要有東西，且預定資料填寫完整才可送出
@@ -443,13 +332,9 @@ function createOrder(userData) {
       }
     )
     .then(function (response) {
-      // console.log(response.data);
       getCartList();
     })
     .catch(function (error) {
-      console.log(error.response.data);
-    })
-    .then(function () {
-      // always executed
+      alert(error);
     });
 }
